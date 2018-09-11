@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="baidu-site-verification" content="L6Lm9d5Crl"/>
+  
+  
+  
+  
+  <title>图虫网图片去除水印 | 年邵多金</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="图虫网图片去除水印： 利用openCV的图层混合算法去除水印，需要使用到一张纯黑背景下的水印效果图和一张纯白背景下的水印效果图。利用颜色加深和颜色减淡算法，几乎达到了完美的效果。（原创）">
+<meta name="keywords" content="opencv">
+<meta property="og:type" content="article">
+<meta property="og:title" content="图虫网图片去除水印">
+<meta property="og:url" content="https://www.shaojin.xin/2018/08/31/图虫网图片去水印/index.html">
+<meta property="og:site_name" content="年邵多金">
+<meta property="og:description" content="图虫网图片去除水印： 利用openCV的图层混合算法去除水印，需要使用到一张纯黑背景下的水印效果图和一张纯白背景下的水印效果图。利用颜色加深和颜色减淡算法，几乎达到了完美的效果。（原创）">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/8500fdd6gy1fusb2k487tj20nz055wee.jpg">
+<meta property="og:image" content="https://ws1.sinaimg.cn/large/8500fdd6gy1fusb3mguhxj20ee04v743.jpg">
+<meta property="og:image" content="http://i67.tinypic.com/bja52t.jpg">
+<meta property="og:image" content="http://i68.tinypic.com/2z4wy9s.jpg">
+<meta property="og:image" content="http://i63.tinypic.com/swwbyb.png">
+<meta property="og:image" content="http://i68.tinypic.com/24vpavt.png">
+<meta property="og:updated_time" content="2018-08-31T03:56:55.013Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="图虫网图片去除水印">
+<meta name="twitter:description" content="图虫网图片去除水印： 利用openCV的图层混合算法去除水印，需要使用到一张纯黑背景下的水印效果图和一张纯白背景下的水印效果图。利用颜色加深和颜色减淡算法，几乎达到了完美的效果。（原创）">
+<meta name="twitter:image" content="https://ws1.sinaimg.cn/large/8500fdd6gy1fusb2k487tj20nz055wee.jpg">
+  
+    <link rel="alternative" href="/atom.xml" title="年邵多金" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/img/favicon.png">
+  
+  
+  <link rel="stylesheet" href="//cdn.bootcss.com/animate.css/3.5.0/animate.min.css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  
+      <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  
+  <!-- 加载特效 -->
+    <script src="/js/pace.js"></script>
+    <link href="/css/pace/pace-theme-flash.css" rel="stylesheet" />
+  <script>
+      var yiliaConfig = {
+          fancybox: true,
+          animate: true,
+          isHome: false,
+          isPost: true,
+          isArchive: false,
+          isTag: false,
+          isCategory: false,
+          open_in_new: false
+      }
+  </script>
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+        <a href="/" class="profilepic">
+            
+            <img lazy-src="/img/lion_512.jpg" class="js-avatar">
+            
+        </a>
+        <hgroup>
+          <h1 class="header-author"><a href="/">Jinxin Shao</a></h1>
+        </hgroup>
+        
+        <p class="header-subtitle">半路转行的斜杠中老年</p>
+        
+        
+            <form>
+                <input type="text" class="st-default-search-input search" id="local-search-input" placeholder="搜索一下" autocomplete="off">
+            </form>
+            <div id="local-search-result"></div>
+        
+        
+            <script type="text/javascript">
+                (function() {
+                    'use strict';
+                    function getMatchData(keyword, data) {
+                        var matchData = [];
+                        for(var i =0;i<data.length;i++){
+                            if(data[i].title.toLowerCase().indexOf(keyword)>=0) 
+                                matchData.push(data[i])
+                        }
+                        return matchData;
+                    }
+                    var $input = $('#local-search-input');
+                    var $resultContent = $('#local-search-result');
+                    $input.keyup(function(){
+                        $.ajax({
+                            url: '/search.json',
+                            dataType: "json",
+                            success: function( json ) {
+                                var str='<ul class=\"search-result-list\">';                
+                                var keyword = $input.val().trim().toLowerCase();
+                                $resultContent.innerHTML = "";
+                                if ($input.val().trim().length <= 0) {
+                                    $resultContent.empty();
+                                    $('#switch-area').show();
+                                    return;
+                                }
+                                var results = getMatchData(keyword, json);
+                                if(results.length === 0){
+                                    $resultContent.empty();
+                                    $('#switch-area').show();
+                                    return;
+                                } 
+                                for(var i =0; i<results.length; i++){
+                                    str += "<li><a href='"+ results[i].url +"' class='search-result-title'>"+ results[i].title +"</a></li>";
+                                }
+                                str += "</ul>";
+                                $resultContent.empty();
+                                $resultContent.append(str);
+                                $('#switch-area').hide();
+                            }
+                        });
+                    });
+                })();
+            </script>
+        
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        
+                    </div>
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        
+                    </ul>
+                </div>
+            </div>
+        
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a  href="/archives/">所有文章</a></li>
+                        
+                            <li><a  href="/categories/adup/">建筑与城市规划</a></li>
+                        
+                            <li><a  href="/categories/design/">平面与三维设计</a></li>
+                        
+                            <li><a  href="/categories/photo/">摄影与视频剪辑</a></li>
+                        
+                            <li><a  href="/categories/app/">游戏与应用开发</a></li>
+                        
+                            <li><a  href="/categories/frontend/">网页与小程序</a></li>
+                        
+                            <li><a  href="/categories/data/">数据分析与人工智能</a></li>
+                        
+                            <li><a  href="/categories/website/">Linux与建站</a></li>
+                        
+                            <li><a  href="/categories/other/">其他</a></li>
+                        
+                            <li><a  href="/about/">关于我</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fl github"  target="_blank" href="https://github.com/Jasonshaojs509" title="github">github</a>
+                            
+                                <a class="fl weibo"  target="_blank" href="https://weibo.com/447185209" title="weibo">weibo</a>
+                            
+                                <a class="fl mail"  target="_blank" href="mailto:m@shaojin.xin" title="mail">mail</a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <a href="/tags/opencv/" style="font-size: 10px;">opencv</a> <a href="/tags/服务器-数据库/" style="font-size: 10px;">服务器,数据库</a>
+                    </div>
+                </section>
+                
+                
+                
+            </div>
+        </div>
+    </header>
+</div>
+
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="回到主页">Jinxin Shao</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                
+                    <img lazy-src="/img/lion_512.jpg" class="js-avatar">
+                
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="回到主页">Jinxin Shao</a></h1>
+            </hgroup>
+            
+            <p class="header-subtitle">半路转行的斜杠中老年</p>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/archives/">所有文章</a></li>
+                
+                    <li><a href="/categories/adup/">建筑与城市规划</a></li>
+                
+                    <li><a href="/categories/design/">平面与三维设计</a></li>
+                
+                    <li><a href="/categories/photo/">摄影与视频剪辑</a></li>
+                
+                    <li><a href="/categories/app/">游戏与应用开发</a></li>
+                
+                    <li><a href="/categories/frontend/">网页与小程序</a></li>
+                
+                    <li><a href="/categories/data/">数据分析与人工智能</a></li>
+                
+                    <li><a href="/categories/website/">Linux与建站</a></li>
+                
+                    <li><a href="/categories/other/">其他</a></li>
+                
+                    <li><a href="/about/">关于我</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                <div class="social">
+                    
+                        <a class="github" target="_blank" href="https://github.com/Jasonshaojs509" title="github">github</a>
+                    
+                        <a class="weibo" target="_blank" href="https://weibo.com/447185209" title="weibo">weibo</a>
+                    
+                        <a class="mail" target="_blank" href="mailto:m@shaojin.xin" title="mail">mail</a>
+                    
+                </div>
+            </nav>
+        </header>
+    </div>
+</nav>
+      <div class="body-wrap"><article id="post-图虫网图片去水印" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a  href="/2018/08/31/图虫网图片去水印/" class="article-date">
+      <time datetime="2018-08-31T03:49:37.000Z" itemprop="datePublished">2018-08-31</time>
+</a>
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      图虫网图片去除水印
+    </h1>
+  
+
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+    <div class="article-category tagcloud">
+    <a class="article-category-link" href="/categories/python/">python</a>
+    </div>
+
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/opencv/">opencv</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <p><strong> 图虫网图片去除水印：</strong> <excerpt in="" index="" |="" 首页摘要=""><br>利用openCV的图层混合算法去除水印，需要使用到一张纯黑背景下的水印效果图和一张纯白背景下的水印效果图。利用颜色加深和颜色减淡算法，几乎达到了完美的效果。（原创）<br><a id="more"></a></excerpt></p>
+<the rest="" of="" contents="" |="" 余下全文="">
+
+<h2 id="OpenCV基础"><a href="#OpenCV基础" class="headerlink" title="OpenCV基础"></a>OpenCV基础</h2><blockquote>
+<p>OpenCV（Open Source Computer Vision Library）是一个跨平台计算机视觉库，实现了图像处理和计算机视觉方面的很多通用算法</p>
+</blockquote>
+<h2 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h2><ul>
+<li>你要确定自己的python版本是3.x，在命令行窗口输入python<br><img src="https://ws1.sinaimg.cn/large/8500fdd6gy1fusb2k487tj20nz055wee.jpg" alt="image"></li>
+<li>需要下载和安装<a href="https://www.microsoft.com/en-us/download/details.aspx?id=53587" target="_blank" rel="noopener">Microsoft Visual C++ 2015 Redistributable</a></li>
+<li>下载对应版本的Numpy，<a href="http://www.lfd.uci.edu/~gohlke/pythonlibs/#numpy" target="_blank" rel="noopener">下载地址</a>，注意版本号和自己的Python版本对应</li>
+<li>下载对应版本的OpenCV，<a href="http://www.lfd.uci.edu/~gohlke/pythonlibs/#opencv" target="_blank" rel="noopener">下载地址</a>，注意版本号和自己的Python版本对应。我的Python是3.6.6，我下载的opencv就是<a href="https://download.lfd.uci.edu/pythonlibs/o4uhg4xd/opencv_python-3.4.2-cp36-cp36m-win_amd64.whl" target="_blank" rel="noopener">opencv_python-3.4.2-cp36-cp36m-win_amd64.whl</a></li>
+<li>到你存放上面两个文件的目录下，打开命令行窗口，输入以下命令进行安装</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install numpy-1.13.1+mkl-cp36-cp36m-win32.whl(此处为你自己下载的相应的文件名）</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install opencv_python-3.3.0-cp36-cp36m-win32.whl(此处为你自己下载的相应的文件名）</span><br></pre></td></tr></table></figure>
+<ul>
+<li>在python命令行输入下面两条，如果没有报错，就表示OK 了<br><img src="https://ws1.sinaimg.cn/large/8500fdd6gy1fusb3mguhxj20ee04v743.jpg" alt="image"></li>
+</ul>
+<hr>
+<h2 id="opencv的常用操作"><a href="#opencv的常用操作" class="headerlink" title="opencv的常用操作"></a>opencv的常用操作</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"># -*- coding: utf-8 -*-</span><br><span class="line">import cv2</span><br><span class="line"></span><br><span class="line">#矩阵形式读取图像为三维列表，每一维分别代表 行、列、像素，像素维度列表中依次为BGR三个颜色通道</span><br><span class="line">img = cv2.imread(&quot;test.jpg&quot;)</span><br><span class="line"></span><br><span class="line">print img.shape #利用numpy的shape方法显示图像矩阵的三维尺寸信息，例如：(533, 800, 3)</span><br><span class="line"></span><br><span class="line">img2 = img.copy() #复制图像</span><br><span class="line">cv2.imwrite(&apos;save.jpg&apos;, img2) #保存</span><br></pre></td></tr></table></figure>
+<hr>
+<h2 id="基于OpenCV的PS图层混合算法去水印方案"><a href="#基于OpenCV的PS图层混合算法去水印方案" class="headerlink" title="基于OpenCV的PS图层混合算法去水印方案"></a>基于OpenCV的PS图层混合算法去水印方案</h2><p>主要借鉴了PS中颜色加深和颜色减淡算法<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">下列公式中，A代表了上面图层像素的色彩值（A=像素值/255），B代表下面图层像素的色彩值（B=像素值/255），C代表了混合像素的色彩值（真实的结果像素值应该为255*C）。该公式也应用于层蒙板。</span><br><span class="line"></span><br><span class="line">颜色加深模式：查看每个通道的颜色信息，通过增加“对比度”使底色的颜色变暗来反映绘图色，和白色混合没变化。</span><br><span class="line"></span><br><span class="line">Color Burn 颜色加深:C=1-(1-B)/A</span><br><span class="line"></span><br><span class="line">该模式如果上层越暗，则下层获取的光越少，如果上层为全黑色，则下层越黑，如果上层为全白色，则根本不会影响下层。结果最亮的地方不会高于下层的像素值。</span><br><span class="line"></span><br><span class="line">颜色减淡模式：</span><br><span class="line"></span><br><span class="line">查看每个通道的颜色信息，通过降低“对比度”使底色的颜色变亮来反映绘图色，和黑色混合没变化。</span><br><span class="line"></span><br><span class="line">Color Dodge 颜色减淡</span><br><span class="line"></span><br><span class="line">C=B/(1-A)</span><br><span class="line"></span><br><span class="line">该模式下，上层的亮度决定了下层的暴露程度。如果上层越亮，下层获取的光越多，也就是越亮。如果上层是纯黑色，也就是没有亮度，则根本不会影响下层。如果上层是纯白色，则下层除了像素为255的地方暴露外，其他地方全部为白色（也就是255，不暴露）。结果最黑的地方不会低于下层的像素值。</span><br></pre></td></tr></table></figure></p>
+<h2 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"># -*- coding: utf-8 -*-</span><br><span class="line">import os</span><br><span class="line">import cv2</span><br><span class="line">import numpy</span><br><span class="line">from PIL import Image</span><br><span class="line"></span><br><span class="line">def get_filename(folder):</span><br><span class="line">    listdir = []</span><br><span class="line"></span><br><span class="line">    def _get_filename(folder):</span><br><span class="line">        for lists in os.listdir(folder):</span><br><span class="line">            path = os.path.join(folder, lists)</span><br><span class="line">            type = os.path.splitext(path)[1]</span><br><span class="line">            if type.lower() == &apos;.jpeg&apos; or type.lower() == &quot;.jpg&quot; or type.lower() == &quot;.png&quot; :</span><br><span class="line">                path = path.replace(open_path, &apos;&apos;) </span><br><span class="line">                listdir.append(path)</span><br><span class="line">            elif os.path.isdir(path):</span><br><span class="line">                _get_filename(path)</span><br><span class="line"></span><br><span class="line">    _get_filename(folder)  # get all .jpg filename in folder recursively</span><br><span class="line">    return listdir</span><br><span class="line"></span><br><span class="line">def removelogo(mask_black_dir,mask_white_dir,path,filelist,save_dir):</span><br><span class="line">    for o in  range(len(filelist)):</span><br><span class="line">        src = cv2.imread(path+filelist[o])</span><br><span class="line">        mask_black = cv2.imread(mask_black_dir)</span><br><span class="line">        mask_white = cv2.imread(mask_white_dir)</span><br><span class="line">        save = numpy.zeros(src.shape, numpy.uint8)</span><br><span class="line">        for row in range(src.shape[0]):</span><br><span class="line">                for col in range(src.shape[1]):</span><br><span class="line">                    for channel in range(src.shape[2]):</span><br><span class="line">                        if (row&gt;(src.shape[0]-mask_white.shape[0]) and col&gt;(src.shape[1]-mask_white.shape[1])) :</span><br><span class="line">                            val_src = src[row, col, channel]</span><br><span class="line">                            val_black = mask_black[row-src.shape[0]+mask_white.shape[0], col-src.shape[1]+mask_white.shape[1], channel]</span><br><span class="line">                            val_white = mask_white[row-src.shape[0]+mask_white.shape[0], col-src.shape[1]+mask_white.shape[1], channel]</span><br><span class="line">                            if val_white == 0:</span><br><span class="line">                                val_1 = 0</span><br><span class="line">                            else:</span><br><span class="line">                                val_1 = 255-256*(255-val_src)/val_white</span><br><span class="line">                                if val_1&lt;0:val_1 = 0</span><br><span class="line">                            if val_black == 255:</span><br><span class="line">                                val_2 = 255</span><br><span class="line">                            else:</span><br><span class="line">                                val_2 = 256*val_1/(255-val_black)</span><br><span class="line">                                if val_2&gt;255:val_2 = 255</span><br><span class="line">                            save[row, col, channel] = val_2</span><br><span class="line">                        else:save[row, col, channel] = src[row, col, channel]</span><br><span class="line">        if not os.path.exists(save_dir):</span><br><span class="line">                os.makedirs(save_dir)</span><br><span class="line">        cv2.imwrite(save_dir+filelist[o], save)</span><br><span class="line">        print(&quot;%6.3f%%&quot;%(100*o/len(filelist)))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">if __name__ == &quot;__main__&quot;:</span><br><span class="line">    removelogo(sys.argv[1],sys.argv[2],sys.argv[3],get_filename(sys.argv[3]),sys.argv[4])</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>使用方法：python xxx.py ./mask_black.jpg ./mask_white.jpg /formpath /topath<br>使用时依次传4个参数进去：黑底水印图路径，白底水印图路径，需要去水印的图片文件夹路径，处理之后保存图片的路径（如果不存在会自动新建文件夹）</p>
+</blockquote>
+<hr>
+<h3 id="去水印前的原始图片："><a href="#去水印前的原始图片：" class="headerlink" title="去水印前的原始图片："></a>去水印前的原始图片：</h3><p><img src="http://i67.tinypic.com/bja52t.jpg" alt="去水印前（原始图片）"></p>
+<h3 id="去水印后的图片效果："><a href="#去水印后的图片效果：" class="headerlink" title="去水印后的图片效果："></a>去水印后的图片效果：</h3><p><img src="http://i68.tinypic.com/2z4wy9s.jpg" alt="去水印后（效果图片）"></p>
+<h3 id="黑底水印图："><a href="#黑底水印图：" class="headerlink" title="黑底水印图："></a>黑底水印图：</h3><p><img src="http://i63.tinypic.com/swwbyb.png" alt="image"></p>
+<h3 id="白底水印图："><a href="#白底水印图：" class="headerlink" title="白底水印图："></a>白底水印图：</h3><p><img src="http://i68.tinypic.com/24vpavt.png" alt="image"></p>
+</the>
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a  href="/2018/08/31/图虫网图片去水印/">图虫网图片去除水印</a></p>
+        <p><span>文章作者:</span><a  href="/" title="访问 Jinxin Shao 的个人博客">Jinxin Shao</a></p>
+        <p><span>发布时间:</span>2018年08月31日 - 11时49分</p>
+        <p><span>最后更新:</span>2018年08月31日 - 11时56分</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2018/08/31/图虫网图片去水印/" title="图虫网图片去除水印">https://www.shaojin.xin/2018/08/31/图虫网图片去水印/</a>
+            <span class="copy-path" data-clipboard-text="原文: https://www.shaojin.xin/2018/08/31/图虫网图片去水印/　　作者: Jinxin Shao" title=""></span>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/cn/" title="中国大陆 (CC BY-NC-SA 3.0 CN)" target = "_blank">"署名-非商用-相同方式共享 3.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+<nav id="article-nav">
+  
+    <a  href="/2018/09/05/建站基础（1）——服务器与数据库/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption"><</strong>
+      <div class="article-nav-title">
+        
+          建站基础（1）——域名、解析、服务器与数据库的基本认识
+        
+      </div>
+    </a>
+  
+  
+</nav>
+
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#OpenCV基础"><span class="toc-number">1.</span> <span class="toc-text">OpenCV基础</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#环境搭建"><span class="toc-number">2.</span> <span class="toc-text">环境搭建</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#opencv的常用操作"><span class="toc-number">3.</span> <span class="toc-text">opencv的常用操作</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#基于OpenCV的PS图层混合算法去水印方案"><span class="toc-number">4.</span> <span class="toc-text">基于OpenCV的PS图层混合算法去水印方案</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#代码"><span class="toc-number">5.</span> <span class="toc-text">代码</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#去水印前的原始图片："><span class="toc-number">5.1.</span> <span class="toc-text">去水印前的原始图片：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#去水印后的图片效果："><span class="toc-number">5.2.</span> <span class="toc-text">去水印后的图片效果：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#黑底水印图："><span class="toc-number">5.3.</span> <span class="toc-text">黑底水印图：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#白底水印图："><span class="toc-number">5.4.</span> <span class="toc-text">白底水印图：</span></a></li></ol></li></ol>
+</div>
+<style>
+    .left-col .switch-btn {
+        display: none;
+    }
+    .left-col .switch-area {
+        display: none;
+    }
+</style>
+<input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+<script>
+    var valueHide = "隐藏目录";
+    var valueShow = "显示目录";
+    if ($(".left-col").is(":hidden")) {
+        $("#tocButton").attr("value", valueShow);
+    }
+    $("#tocButton").click(function() {
+        if ($("#toc").is(":hidden")) {
+            $("#tocButton").attr("value", valueHide);
+            $("#toc").slideDown(320);
+            $(".switch-btn, .switch-area").fadeOut(300);
+        }
+        else {
+            $("#tocButton").attr("value", valueShow);
+            $("#toc").slideUp(350);
+            $(".switch-btn, .switch-area").fadeIn(500);
+        }
+    })
+    if ($(".toc").length < 1) {
+        $("#toc, #tocButton").hide();
+        $(".switch-btn, .switch-area").show();
+    }
+</script>
+
+
+
+
+<div class="bdsharebuttonbox">
+	<a href="#" class="fx fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+	<a href="#" class="fx fa-weixin bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+	<a href="#" class="fx fa-qq bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+	<a href="#" class="fx fa-facebook-official bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+	<a href="#" class="fx fa-twitter bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+	<a href="#" class="fx fa-linkedin bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+	<a href="#" class="fx fa-files-o bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+</div>
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"2","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='https://www.shaojin.xin/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+
+
+
+    
+        <section class="changyan" id="comments">
+  <!--<div id="uyan_frame"></div>-->
+  <div id="SOHUCS"></div>
+  <script charset="utf-8" type="text/javascript" src="https://changyan.sohu.com/upload/changyan.js"></script>
+  <script type="text/javascript">
+    window.changyan.api.config({
+      appid: 'cytNoIK7h',
+      conf: 'prod_f63db82344fbd8d6630aefb6cbad8416'
+    });
+  </script>
+</section>
+    
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a  href="/2018/09/05/建站基础（1）——服务器与数据库/" title="上一篇: 建站基础（1）——域名、解析、服务器与数据库的基本认识">
+                <i class="fa fa-angle-left"></i>
+            </a>
+        
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+        
+            <a  href="/" title="回到主页"><i class="fa fa-home"></i></a>
+        
+    </div>
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/09/05/建站基础（1）——服务器与数据库/">建站基础（1）——域名、解析、服务器与数据库的基本认识</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/08/31/图虫网图片去水印/">图虫网图片去除水印</a></li></ul>
+    
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+    <script>
+        $(".post-list").addClass("toc-article");
+        // $(".post-list-item a").attr("target","_blank");
+        $("#post-nav-button > a:nth-child(2)").click(function() {
+            $(".fa-bars, .fa-times").toggle();
+            $(".post-list").toggle(300);
+            if ($(".toc").length > 0) {
+                $("#toc, #tocButton").toggle(200, function() {
+                    if ($(".switch-area").is(":visible")) {
+                        $("#toc, .switch-btn, .switch-area").toggle();
+                        $("#tocButton").attr("value", valueHide);
+                        }
+                    })
+            }
+            else {
+                $(".switch-btn, .switch-area").fadeToggle(300);
+            }
+        })
+    </script>
+
+
+
+
+    <script>
+        
+    </script>
+
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                &copy; 2018 Jinxin Shao
+            </div>
+            <div class="footer-right">
+                <a href="https://github.com/Jasonshaojs509" target="_blank">Blog</a> by ShaoJinxin
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" >极客到访数: 
+                            <span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>, </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit">本页阅读量: 
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+
+    </div>
+    
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+
+<script src="/js/main.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var backgroundnum = 1;
+            var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+            $("#mobile-nav").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+            $(".left-col").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+        })
+    </script>
+
+
+
+
+	<script>
+	var _hmt = _hmt || [];
+	(function() {
+	  var hm = document.createElement("script");
+	  hm.src = "//hm.baidu.com/hm.js?4851c1ec840f05ca6b7c5ecdbe4c3521";
+	  var s = document.getElementsByTagName("script")[0]; 
+	  s.parentNode.insertBefore(hm, s);
+	})();
+	</script>
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    $(document).ready(function() {
+        if ($("#comments").length < 1) {
+            $("#scroll > a:nth-child(2)").hide();
+        };
+    })
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+  <script language="javascript">
+    $(function() {
+        $("a[title]").each(function() {
+            var a = $(this);
+            var title = a.attr('title');
+            if (title == undefined || title == "") return;
+            a.data('title', title).removeAttr('title').hover(
+            function() {
+                var offset = a.offset();
+                $("<div id=\"anchortitlecontainer\"></div>").appendTo($("body")).html(title).css({
+                    top: offset.top - a.outerHeight() - 15,
+                    left: offset.left + a.outerWidth()/2 + 1
+                }).fadeIn(function() {
+                    var pop = $(this);
+                    setTimeout(function() {
+                        pop.remove();
+                    }, pop.text().length * 800);
+                });
+            }, function() {
+                $("#anchortitlecontainer").remove();
+            });
+        });
+    });
+</script>
+
+
+  </div>
+</body>
+</html>
